@@ -5,11 +5,14 @@ class VideoProcessor {
     private $con;
     private $sizeLimit = 500000000; //0.5gb
     private $allowedTypes = array("mp4", "flv", "webm", "mkv", "vob", "ogv", "ogg", "avi", "wmv", "mov", "mpeg", "mpg", "3gp");
+
     private $ffmpegPath;
+    private $ffprobePath;
 
     public function __construct($con) {
         $this->con = $con;
         $this->ffmpegPath = realpath("ffmpeg/bin/ffmpeg.exe");
+        $this->ffprobePath = realpath("ffmpeg/bin/ffprobe.exe");
     }
 
     public function upload($videoUploadData) {
@@ -43,9 +46,16 @@ class VideoProcessor {
             }
 
             if(!$this->deleteFile($tempFilePath)) {
-                echo "Delete failed\n";
+                echo "Upload failed - could not delete!\n";
                 return false;
             }
+
+            if(!$this->generateThumbnails($finalFilePath)) {
+                echo "Upload failed - could not generate thumbmnails!\n";
+                return false;
+            }
+
+            return true;
         }
 
     }
@@ -115,6 +125,79 @@ class VideoProcessor {
         }
         
         return true;
+    }
+
+    public function generateThumbnails($filePath) {
+
+        $thumbnailSize = "210x118";
+        $numThumbnails = 3;
+        $pathToThumbnails = "uploads/videos/thumbnails";
+
+        $duration = $this->getVideoDuration($filePath);
+
+        $videoId = $this->con->lastInsertId();
+        $this->updateDuration($duration, $videoId);
+
+        // echo "duration: $duration";
+
+        for($num = 1; $num <= $numThumbnails; $num++) {
+            $imageName = uniqid() . ".jpg";
+            $interval = ($duration * 0.8) / $numThumbnails * $num;
+            $fullThumbnailPath = "$pathToThumbnails/$videoId-$imageName";
+
+            $cmd = "$this->ffmpegPath -i $filePath -ss $interval -s $thumbnailSize -vframes 1 $fullThumbnailPath 2>&1";
+
+            $outputLog = array();
+            exec($cmd, $outputLog, $returnCode);
+
+            if($returnCode != 0) {
+                // command failed
+                foreach($outputLog as $line) {
+                    echo $line . "<br>";
+                }
+            }
+
+            $query = $this->con->prepare("INSERT INTO thumbnails(videoId, filePath, selected) VALUES(:videoId, :filePath, :selected)");
+            $query->bindParam(":videoId", $videoId);
+            $query->bindParam(":filePath", $fullThumbnailPath);
+            $query->bindParam(":selected", $selected);
+
+            $selected = $num == 1 ? 1 : 0;
+
+            $success = $query->execute();
+
+            if(!$success) {
+                echo "Error inserting thumnail!\n";
+                return false;
+            }
+
+        }
+
+        return true;
+
+    }
+
+    private function getVideoDuration($filePath) {
+        return (int)shell_exec("$this->ffprobePath -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $filePath");
+    }
+
+    private function updateDuration($duration, $videoId) {
+        
+        $hours = floor($duration / 3600);
+        $mins = floor(($duration - ($hours * 3600)) / 60);
+        $secs = floor($duration % 60);
+
+        $hours = ($hours < 1) ? "" : $hours . ":";
+        $mins = ($mins < 10) ? "0" . $mins . ":" : $mins . ":";
+        $secs = ($secs < 10) ? "0" . $secs : $secs;
+
+        $duration = $hours.$mins.$secs;
+
+        $query = $this->con->prepare("UPDATE videos SET duration=:duration WHERE id=:videoId");
+        $query->bindParam(":duration", $duration);
+        $query->bindParam(":videoId", $videoId);
+        $query->execute();
+
     }
 }
 
