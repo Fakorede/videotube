@@ -20,6 +20,10 @@ $video->incrementViews();
         echo $videoPlayer->create(true);
     ?>
 </div>
+
+<div class="suggestions">
+
+</div>
                 
 
 
