@@ -24,23 +24,35 @@ class Account {
     }
 
     public function insertUserDetails($firstName, $lastName, $username, $email, $password) {
-        return true;
+        
+        $password = hash("sha512", $password);
+        $profilePic = "assets/images/profilePictures/default.png";
+
+        $query = $this->con->prepare("INSERT INTO users (firstName, lastName, username, email, password, profilePic) VALUES(:fn, :ln, :un, :email, :pass, :pic)");
+        $query->bindParam(":fn", $firstName);
+        $query->bindParam(":ln", $lastName);
+        $query->bindParam(":un", $username);
+        $query->bindParam(":email", $email);
+        $query->bindParam(":pass", $password);
+        $query->bindParam(":pic", $profilePic);
+
+        $query->execute();
     }
 
     private function validateFirstName($firstName) {
-        if(strlen($firstName) > 25 || strlen($firstName < 2)) {
+        if(strlen($firstName) < 2 || strlen($firstName) > 25) {
             array_push($this->errorArray, Constants::$firstNameCharacters);
         }
     }
 
     private function validateLastName($lastName) {
-        if(strlen($lastName) > 25 || strlen($lastName < 2)) {
+        if(strlen($lastName) < 2 || strlen($lastName) > 25) {
             array_push($this->errorArray, Constants::$lastNameCharacters);
         }
     }
 
     private function validateUsername($username) {
-        if(strlen($username) > 25 || strlen($username < 5)) {
+        if(strlen($username) < 2 || strlen($username) > 25) {
             array_push($this->errorArray, Constants::$usernameCharacters);
             return;
         }
@@ -85,7 +97,7 @@ class Account {
             return;
         }
 
-        if(strlen($password) > 30 || strlen($password < 5)) {
+        if(strlen($password) < 5 || strlen($password) > 30) {
             array_push($this->errorArray, Constants::$passwordLength);
         }
 
