@@ -22,7 +22,9 @@ if(isset($_POST["submitButton"])) {
     $wasSuccessful = $account->register($firstName, $lastName, $username, $email, $email2, $password, $password2);
 
     if($wasSuccessful) {
-        echo "Registeration Successful!";
+        // set session variable and redirect
+        $_SESSION["userLoggedIn"] = $username;
+        header("Location: index.php");
     }
 
 }
