@@ -117,16 +117,26 @@ class Video {
             return json_encode($result);
 
         } else {
+
             // if disliked, delete dislike
             $query = $this->con->prepare("DELETE FROM dislikes WHERE username = :username AND videoId = :videoId");
             $query->bindParam(":username", $username);
             $query->bindParam(":videoId", $id);
             $query->execute();
+            $count = $query->rowCount(); // dislike no = 0
+
             // like video
             $query = $this->con->prepare("INSERT INTO likes(username, videoId) VALUES(:username, :videoId)");
             $query->bindParam(":username", $username);
             $query->bindParam(":videoId", $id);
             $query->execute();
+
+            $result = array(
+                "likes" => 1,
+                "dislikes" => 0 - $count
+            );
+            
+            return json_encode($result);
         }
     }
 
