@@ -1,5 +1,6 @@
 <?php
 
+require_once("includes/classes/ButtonProvider.php");
 class VideoInfoControls {
 
     private $video, $userLoggedInObj;
@@ -23,9 +24,16 @@ class VideoInfoControls {
     }
 
     private function createLikeButton() {
-        return "
-            <button>Like</button>
-        ";
+        $text = $this->video->getLikes();
+        $videoId = $this->video->getId();
+        $action = "likeVideo(this, $videoId)";
+        $class = "LikeButton";
+
+        $imageSrc = "assets/images/icons/thumb-up.png";
+
+        // change button img if video has already been liked
+
+        return ButtonProvider::createButton($text, $imageSrc, $action, $class);
     }
 
     private function createDislikeButton() {
