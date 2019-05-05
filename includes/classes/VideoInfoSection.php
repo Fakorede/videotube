@@ -1,6 +1,7 @@
 <?php
 
 require_once("includes/classes/VideoInfoControls.php");
+require_once("includes/classes/ButtonProvider.php");
 
 class VideoInfoSection {
 
@@ -29,7 +30,7 @@ class VideoInfoSection {
                 <h1>$title</h1>
 
                 <div class='bottomSection'>
-                    <span class='viewCount'>$views</span>
+                    <span class='viewCount'>$views views</span>
                     $controls
                 </div>
 
@@ -39,6 +40,17 @@ class VideoInfoSection {
 
     private function createSecondaryInfo() {
 
+        $description = $this->video->getDescription();
+        $uploadDate = $this->video->getUploadDate();
+        $uploadedBy = $this->video->getUploadedBy();
+        $profileButton = ButtonProvider::createUserProfileButton($this->con, $uploadedBy);
+
+        return "
+            <div class='secondaryInfo'>
+                <div class='topRow'>
+                    $profileButton
+                </div>
+            </div>";
     }
 
 }
