@@ -6,5 +6,9 @@ function likeVideo(button, videoId) {
 
     likeButton.addClass("active");
     dislikeButton.removeClass("active");
+
+    // parse returned string to json object
+    var result = JSON.parse(data);
+    console.log(result);
   });
 }
