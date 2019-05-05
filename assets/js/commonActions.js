@@ -12,3 +12,7 @@ $(document).ready(function() {
     main.toggleClass("leftPadding");
   });
 });
+
+function notSignedIn() {
+  alert("signin");
+}
