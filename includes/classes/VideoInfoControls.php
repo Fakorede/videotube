@@ -27,7 +27,7 @@ class VideoInfoControls {
         $text = $this->video->getLikes();
         $videoId = $this->video->getId();
         $action = "likeVideo(this, $videoId)";
-        $class = "LikeButton";
+        $class = "likeButton";
 
         $imageSrc = "assets/images/icons/thumb-up.png";
 
@@ -47,7 +47,10 @@ class VideoInfoControls {
 
         $imageSrc = "assets/images/icons/thumb-down.png";
 
-        // change button img if video has already been liked
+        // change button img if video is disliked
+        if($this->video->wasDislikedBy()) {
+            $imageSrc = "assets/images/icons/thumb-down-active.png";
+        }
 
         return ButtonProvider::createButton($text, $imageSrc, $action, $class);
     }
