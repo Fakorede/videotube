@@ -49,7 +49,7 @@ class User {
     }
 
     public function isSubscribedTo($userTo) {
-        $query = $this->con->preapre("SELECT * FROM subscribers WHERE userTo = :userTo AND userFrom = :userFrom");
+        $query = $this->con->prepare("SELECT * FROM subscribers WHERE userTo = :userTo AND userFrom = :userFrom");
         $query->bindParam(":userTo", $userTo);
         $query->bindParam(":userFrom", $username);
         $username = $this->getUsername();
@@ -59,7 +59,7 @@ class User {
     }
 
     public function getSubscriberCount() {
-        $query = $this->con->preapre("SELECT * FROM subscribers WHERE userTo = :userTo");
+        $query = $this->con->prepare("SELECT * FROM subscribers WHERE userTo = :userTo");
         $query->bindParam(":userTo", $username);
         $username = $this->getUsername();
 
