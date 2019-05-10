@@ -58,7 +58,7 @@ function getInputValue($name) {
                     <?php echo $account->getError(Constants::$loginFailed); ?>
                     <input type="text" name="username" placeholder="Username" value="<?php getInputValue('username'); ?>" autocomplete="off" required>
                     <input type="password" name="password" placeholder="Password" required>
-                    <input type="submit" value="SUBMIT" name="submitButton>
+                    <input type="submit" value="SUBMIT" name="submitButton">
                 </form>
             </div>
 
