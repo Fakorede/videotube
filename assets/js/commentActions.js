@@ -5,6 +5,14 @@ function postComment(button, postedBy, videoId, replayTo, containerClass) {
   textarea.val("");
 
   if (commentText) {
+    $.post("ajax/postComment.php", {
+      commentText: commentText,
+      postedBy: postedBy,
+      videoId: videoId,
+      responseTo: replayTo
+    }).done(function(data) {
+      alert(data);
+    });
   } else {
     alert("cant post empty comment");
   }
