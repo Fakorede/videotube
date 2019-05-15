@@ -10,8 +10,8 @@ function postComment(button, postedBy, videoId, replayTo, containerClass) {
       postedBy: postedBy,
       videoId: videoId,
       responseTo: replayTo
-    }).done(function(data) {
-      alert(data);
+    }).done(function(comment) {
+      $("." + containerClass).prepend(comment);
     });
   } else {
     alert("cant post empty comment");
