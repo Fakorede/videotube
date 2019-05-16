@@ -469,4 +469,11 @@ a:hover {
   height: 50px;
 }
 
+.commentSection .comment .timestamp {
+  color: #888;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
 
